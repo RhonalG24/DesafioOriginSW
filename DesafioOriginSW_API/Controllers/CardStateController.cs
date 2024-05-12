@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DesafioOriginSW_API.Data;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -8,16 +9,16 @@ namespace DesafioOriginSW_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OperationTypeController : ControllerBase
+    public class CardStateController : ControllerBase
     {
         private readonly ILogger _logger;
-        private readonly IOperationTypeRepository _repo;
+        private readonly ICardStateRepository _repo;
         private readonly IMapper _mapper;
         protected APIResponse _response;
 
 
-        public OperationTypeController(ILogger<OperationTypeController> logger,
-                                    IOperationTypeRepository repo,
+        public CardStateController(ILogger<CardStateController> logger,
+                                    ICardStateRepository repo,
                                     IMapper mapper)
         {
             _logger = logger;
@@ -28,19 +29,19 @@ namespace DesafioOriginSW_API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllOperationTypes()
+        public async Task<ActionResult<APIResponse>> GetAllCardStates()
         {
             try
             {
-                IEnumerable<OperationType> operationTypeList = await _repo.GetAll();
-                _response.Result = operationTypeList;
+                IEnumerable<CardState> cardStateList = await _repo.GetAll();
+                _response.Result = cardStateList;
                 _response.IsSuccessful = true;
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
 
             } catch (Exception ex)
             {
-                _logger.LogError("GetOperationTypes", ex.Message);
+                _logger.LogError("GetAllCardStates", ex.Message);
                 _response.IsSuccessful = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.ErrorsMessage = new List<string>() { ex.ToString() }; 
@@ -49,24 +50,24 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpGet("id:int", Name = "GetOperationType")]
+        [HttpGet("id:int", Name = "GetCardState")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetOperationType(int id)
+        public async Task<ActionResult<APIResponse>> GetCardState(int id)
         {
             try
             {
                 //_logger.LogInformation("Get all accounts");
-                var operationTypeFiltered = await _repo.Get(x => x.id_operation_type == id);
-                if (operationTypeFiltered == null)
+                var cardStateFiltered = await _repo.Get(x => x.id_card_state == id);
+                if (cardStateFiltered == null)
                 {
                     _response.IsSuccessful = false;
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
 
                 }
-                _response.Result = operationTypeFiltered;
+                _response.Result = cardStateFiltered;
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }

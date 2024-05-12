@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace DesafioOriginSW_API.Models
 {
-    public class OperationType
+    public class CardState
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 id_operation_type { get; set; }
-
+        public Int32 id_card_state { get; set; }
+        
         [Required]
         public String name { get; set; }
     }

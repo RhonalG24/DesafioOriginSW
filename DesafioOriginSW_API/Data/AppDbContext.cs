@@ -11,6 +11,10 @@ namespace DesafioOriginSW_API.Data
         }
 
         public DbSet<OperationType> operation_type { get; set; }
+        public DbSet<Operation> operation { get; set; }
+        public DbSet<CardState> card_state { get; set; }
+        public DbSet<BankCard> bank_card { get; set; }
+        public DbSet<Account> account { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
