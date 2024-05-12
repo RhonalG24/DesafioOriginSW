@@ -121,6 +121,7 @@ namespace DesafioOriginSW_API.Controllers
         [HttpPatch("id:int")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> UpdatePartialAccount(int id, JsonPatchDocument<UpdateAccountDTO> accountDTO)
         {
             if (accountDTO == null ) return BadRequest();

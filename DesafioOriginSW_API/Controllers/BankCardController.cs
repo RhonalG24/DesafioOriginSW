@@ -16,6 +16,7 @@ namespace DesafioOriginSW_API.Controllers
     {
         private readonly ILogger _logger;
         private readonly IBankCardRepository _repo;
+        private readonly ICardStateRepository _repoCardState;
         private readonly IAccountRepository _repoAccount;
         private readonly IOperationTypeRepository _repoOperationType;
         private readonly AppDbContext _db;
@@ -25,6 +26,7 @@ namespace DesafioOriginSW_API.Controllers
 
         public BankCardController(ILogger<OperationController> logger,
                                     IBankCardRepository repo,
+                                    ICardStateRepository repoCardState,
                                     IAccountRepository repoAccount,
                                     IOperationTypeRepository repoOperationType,
                                     AppDbContext db,
@@ -32,6 +34,7 @@ namespace DesafioOriginSW_API.Controllers
         {
             _logger = logger;
             _repo = repo;
+            _repoCardState = repoCardState;
             _repoAccount = repoAccount;
             _repoOperationType = repoOperationType;
             _db = db;
@@ -97,13 +100,6 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        
-    //        var order = context.Orders
-    //.Include(o => o.Customer) // Incluye los datos relacionados de Customer
-    //.FirstOrDefault();
-
-
-        //}
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -140,8 +136,132 @@ namespace DesafioOriginSW_API.Controllers
                 _response.ErrorsMessage = new List<string>() { ex.ToString() };
                 return _response;
             }
+        }
 
-            //TODO: demás operaciones, como: bloquear tarjeta, retirar dinero, verificar dinero en la cuenta, consultar saldo
+        [HttpGet("Check/Number/bank_card_number:string", Name = "CheckBankCardNumber")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CheckBankCardNumberDTO(String bank_card_number)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+                
+                BankCard bankCardFiltered = await _repo.Get(v => v.number == bank_card_number);
+                if (bankCardFiltered == null)
+                {
+                    _response.IsSuccessful = false;
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    _response.Result = bank_card_number;
+                    return NotFound(_response);
+
+                }
+                //Verify if it's blocked
+                if (bankCardFiltered.id_card_state == await GetIdForBlockedCardState())
+                {
+                    _response.IsSuccessful = false;
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.Result = bank_card_number;
+                    _response.ErrorsMessage = new List<String>() { "The card is blocked" };
+                    return Unauthorized(_response);
+                }
+
+                CheckBankCardNumberRespondDTO BankCardRespond = _mapper.Map<CheckBankCardNumberRespondDTO>(bankCardFiltered);
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.Result = BankCardRespond;
+                return Ok(_response);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("CheckBankCardNumber", ex.Message);
+                _response.IsSuccessful = false;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.ErrorsMessage = new List<string>() { ex.ToString() };
+                return _response;
+            }
+        }
+        
+        [HttpPost("Check/Pin/bank_card_id:int", Name = "CheckCardPin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<APIResponse>> CheckBankCardPin(int bank_card_id, [FromBody] CheckBankCardPinDTO checkCardPinDTO)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+                
+                BankCard bankCardFiltered = await _repo.Get(v => v.id_bank_card == checkCardPinDTO.id_bank_card);
+                if (bankCardFiltered == null)
+                {
+                    _response.IsSuccessful = false;
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    _response.Result = checkCardPinDTO;
+                    return NotFound(_response);
+
+                }
+                //Verify if it's blocked
+                if (bankCardFiltered.id_card_state == await GetIdForBlockedCardState())
+                {
+                    _response.IsSuccessful = false;
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.Result = checkCardPinDTO;
+                    _response.ErrorsMessage = new List<String>() { "The card is blocked" };
+                    return Unauthorized(_response);
+                }
+                    //Verify card pin
+                if ( bankCardFiltered.pin != checkCardPinDTO.pin)
+                {
+                    _response.IsSuccessful = false;
+                    _response.Result = checkCardPinDTO;
+                    bankCardFiltered.failed_attempts += 1;
+                    if( bankCardFiltered.failed_attempts >= 4)
+                    {
+                        bankCardFiltered.id_card_state = await GetIdForBlockedCardState();
+                        _response.ErrorsMessage = new List<String>() { "PIN invalid", "The card has been blocked" };
+                    }
+                    else
+                    {
+                        int remaining_attempts = 4 - bankCardFiltered.failed_attempts;
+                        _response.ErrorsMessage = new List<String>() { "PIN invalid", "remaining_attempts: " + (remaining_attempts >= 0 ? remaining_attempts : 0) };
+                    }
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+
+                    BankCard updatedErrorBankCard = _mapper.Map<BankCard>(bankCardFiltered);
+                    await _repo.Update(updatedErrorBankCard);
+                    return Unauthorized(_response);
+                }
+
+                /*Reset Bank Card Failed Attempts*/
+                bankCardFiltered.failed_attempts = 0;
+                BankCard updatedBankCard = _mapper.Map<BankCard>(bankCardFiltered);
+                await _repo.Update(updatedBankCard);
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.Result = bankCardFiltered;
+                return Ok(_response);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("CheckBankCardPin", ex.Message);
+                _response.IsSuccessful = false;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.ErrorsMessage = new List<string>() { ex.ToString() };
+                return _response;
+            }
+        }
+
+        private async Task<int> GetIdForBlockedCardState()
+        {
+            CardState cardState = await _repoCardState.Get(v => v.name == "bloqueada");
+
+            return cardState.id_card_state;
         }
     }
 }

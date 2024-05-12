@@ -14,6 +14,8 @@ namespace DesafioOriginSW_API.DTO_s
 
         [MaxLength(4), MinLength(4)]
         public String pin { get; set; }
+        
+        public Int32 failed_attempts { get; set; }
         public Int32 id_card_state { get; set; }
         public DateOnly expiry_date { get; set; }
     }

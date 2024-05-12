@@ -25,6 +25,8 @@ namespace DesafioOriginSW_API.Models
         [Required]
         public DateOnly expiry_date { get; set; }
 
+        public Int32 failed_attempts { get; set; }
+
         [ForeignKey("id_account")]
         public Account account{ get; set; }
         

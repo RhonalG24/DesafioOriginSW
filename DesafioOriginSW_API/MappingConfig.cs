@@ -14,6 +14,8 @@ namespace DesafioOriginSW_API
             CreateMap<BankCard, BankCardDTO>().ReverseMap();
             CreateMap<BankCard, BankCardPinDTO>().ReverseMap();
             CreateMap<BankCard, CreateBankCardDTO>().ReverseMap();
+            CreateMap<BankCard, CheckBankCardNumberRespondDTO>().ReverseMap();
+
 
             CreateMap<Operation, OperationDTO>().ReverseMap();
             CreateMap<Operation, CreateOperationDTO>().ReverseMap();
