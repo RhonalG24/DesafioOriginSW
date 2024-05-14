@@ -2,7 +2,7 @@
 
 namespace DesafioOriginSW_API.DTO_s
 {
-    public class CheckBalanceDTO
+    public class GetBalanceDTO
     {
         public Double balance { get; set; }
 
