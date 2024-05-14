@@ -6,7 +6,6 @@ Este fue desarrollado usando ASP.NET Core API en su versión 7 y para el lado de
 ## Cómo configurar el proyecto en su equipo
 Se debe clonar o descargar el proyecto desde [Github](https://github.com/RhonalG24/DesafioOriginSW). 
 
-
 ## Creación de la base de datos:
 Dentro de la carperta "Recursos" se encuentran dos scripts SQL. 
 Para crear la base de datos y las tablas se debe ejecutar dentro de SQLServer el archivo "CreateDatabaseAndTables.sql".
@@ -41,15 +40,33 @@ En caso de no tener instalado Node.js verás un mensaje de error que te avisa qu
 2. Ejecuta el instalador descargado y sigue las instrucciones del asistente de instalación.
 3. Una vez completada la instalación, puedes verificar si Node.js se instaló correctamente abriendo la consola de comandos de Windows y ejecutando el comando node -v. Esto mostrará la versión de Node.js instalada en tu sistema.
 
-Finalmente, para levantar el servidor de React se debe abrir la carpeta DesafioOriginSW_Client desde la terminal de comando haciendo click derecho en la carpeta y seleccionando la opcion "Abril en terminal". Una vez en la terminal se ejecuta el siguiente comando:
+### Configurar el servidor de React
+Ahora, para configurar el servidor de React se debe primero ejecutar el archivo client_setup.bat, el cual instalará los paquetes necesarios por lo que sólo es necesario ejecutarlo una sola vez.
+
+### Iniciar el servidor de React
+Finalmente, para iniciar el servidor de React se debe ejecutar el archivo client_launcher.bat. Este iniciará el servidor del cliente y abrirá una nueva ventana del navegador apuntando a [localhost](http://localhost:3000/).
+
+Si desea hacer estos pasos manualmente tendría que:
+1. Abrir la carpeta desafiooriginsw_client desde la terminal de comando haciendo click derecho en la carpeta y seleccionando la opcion "Abril en terminal". 
+2. Una vez en la terminal se ejecuta el siguiente comando:
 ```
+npm install
+
 npm run start
 ```
+El cliente se iniciará en [localhost](http://localhost:3000/).
 
-El cliente se iniciará en localhost:3000.
 
+## Endpoinsts
 La aplicación hace uso de 4 endpoints en total:
-- https://localhost:7210//api/BankCard/check/number/{bank_card_number} para verificar si la tarjeta existe en el sistema.
-- https://localhost:7210//api/BankCard/check/pin/{bank_card_id} para validar que el pin es correcto. Por cada intento fallido se va actualizando en la base de datos la cantidad total de intentos. Una vez llega a 4 intentos fallidos, se le cambia el estado de la tarjeta a "Bloqueada", lo cual no permite que se pueda pasar de la verificación de la tarjeta.
-- https://localhost:7210//api/Operation/balance/{bank_card_id} para realizar la operación de consulta de saldo.
-- https://localhost:7210//api/Operation/withdrawal para realizar la operación de retiro de dinero.
+- https://localhost:7210/api/BankCard/check/number/{bank_card_number} para verificar si la tarjeta existe en el sistema.
+- https://localhost:7210/api/BankCard/check/pin/{bank_card_id} para validar que el pin es correcto. Por cada intento fallido se va actualizando en la base de datos la cantidad total de intentos. Una vez llega a 4 intentos fallidos, se le cambia el estado de la tarjeta a "Bloqueada", lo cual no permite que se pueda pasar de la verificación de la tarjeta.
+- https://localhost:7210/api/Operation/balance/{bank_card_id} para realizar la operación de consulta de saldo.
+- https://localhost:7210/api/Operation/withdrawal para realizar la operación de retiro de dinero.
+
+Hay otros endpoints por si se necesita añadir data desde el [Swagger] (https://localhost:7210/swagger/index.html), como por ejemplo:
+- /api/Account/{id} (con el método PUT) para modificar el saldo de una cuenta.
+- /api/BankCard (método POST) para crear una nueva tarjeta bancaria asociada a una cuenta existente.
+- /api/CardState (método GET) para conocer todos los posibles estados que puede tener una tarjeta.
+- /api/Operation (método GET) para ver todas las operaciones bancarias que se han realizado en el sistema.
+- /api/OperationType (método GET) para conocer todos los posibles tipos de operación bancaria.
