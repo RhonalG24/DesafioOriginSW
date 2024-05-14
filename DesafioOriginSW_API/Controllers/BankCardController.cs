@@ -3,6 +3,7 @@ using DesafioOriginSW_API.Data;
 using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Repository.IRepository;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +25,15 @@ namespace DesafioOriginSW_API.Controllers
         protected APIResponse _response;
 
 
-        public BankCardController(ILogger<OperationController> logger,
-                                    IBankCardRepository repo,
-                                    ICardStateRepository repoCardState,
-                                    IAccountRepository repoAccount,
-                                    IOperationTypeRepository repoOperationType,
-                                    AppDbContext db,
-                                    IMapper mapper)
+        public BankCardController(
+            ILogger<OperationController> logger,
+            IBankCardRepository repo,
+            ICardStateRepository repoCardState,
+            IAccountRepository repoAccount,
+            IOperationTypeRepository repoOperationType,
+            AppDbContext db,
+            IMapper mapper
+        )
         {
             _logger = logger;
             _repo = repo;
@@ -69,7 +72,7 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpGet("id:int", Name = "GetBankCard")]
+        [HttpGet("{id}", Name = "GetBankCard")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -138,7 +141,8 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
 
-        [HttpGet("Check/Number/bank_card_number:string", Name = "CheckBankCardNumber")]
+        //[EnableCors("AllowSpecificOrigin")]
+        [HttpGet("check/number/{bank_card_number}", Name = "CheckBankCardNumber")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -185,7 +189,7 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
         
-        [HttpPost("Check/Pin/bank_card_id:int", Name = "CheckCardPin")]
+        [HttpPost("check/pin/{bank_card_id}", Name = "CheckCardPin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

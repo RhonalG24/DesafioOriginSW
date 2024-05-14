@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using DesafioOriginSW_API.DTO_s;
+using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Repository.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -16,14 +16,16 @@ namespace DesafioOriginSW_API.Controllers
         private readonly ILogger _logger;
         private readonly IAccountRepository _repo;
         private readonly IMapper _mapper;
+        private readonly IAccountHandler _handler;
         protected APIResponse _response;
 
-        public AccountController(ILogger<AccountController> logger, IAccountRepository repo, IMapper mapper)
+        public AccountController(IAccountHandler handler, ILogger<AccountController> logger, IAccountRepository repo, IMapper mapper)
         {
-            _logger = logger;
-            _repo = repo;
+            _handler = handler ?? throw new ArgumentNullException(nameof(handler));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _response = new();
-            _mapper = mapper;
         }
 
         [HttpGet]
@@ -33,9 +35,9 @@ namespace DesafioOriginSW_API.Controllers
             try
             {
                 _logger.LogInformation("Get all accounts");
-                IEnumerable<Account> accountList = await _repo.GetAll();
+                IEnumerable<Account> accountList = await _handler.GetAllAccounts();
                 _response.StatusCode = HttpStatusCode.OK;
-                _response.Result = accountList;
+                _response.Result = accountList ?? throw new ArgumentNullException(nameof(accountList));
 
                 return Ok(_response);
             }
@@ -49,7 +51,7 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
 
-        [HttpGet("id:int", Name = "GetAccount")]
+        [HttpGet("{id}", Name = "GetAccount")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -66,7 +68,7 @@ namespace DesafioOriginSW_API.Controllers
                     return NotFound(_response);
 
                 }
-                _response.Result = accountFiltered;
+                _response.Result = accountFiltered ?? throw new ArgumentNullException(nameof(accountFiltered));
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response);
             }
@@ -81,13 +83,14 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpPut("id:int")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<APIResponse>> UpdateAccount(int id, [FromBody] UpdateAccountDTO accountDTO)
         {
-            try {
+            try
+            {
                 if (accountDTO == null) return BadRequest();
                 if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -101,14 +104,15 @@ namespace DesafioOriginSW_API.Controllers
 
                 Account newAccount = _mapper.Map<Account>(accountDTO);
                 newAccount.id_account = id;
-                
+
                 await _repo.Update(newAccount);
                 _response.StatusCode = HttpStatusCode.OK;
-                _response.Result = newAccount;
+                _response.Result = newAccount ?? throw new ArgumentNullException(nameof(newAccount));
 
                 return Ok(_response);
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 _logger.LogError("Update account", ex.Message);
                 _response.IsSuccessful = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
@@ -118,17 +122,17 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpPatch("id:int")]
+        [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> UpdatePartialAccount(int id, JsonPatchDocument<UpdateAccountDTO> accountDTO)
         {
-            if (accountDTO == null ) return BadRequest();
-            
+            if (accountDTO == null) return BadRequest();
+
             var oldAccount = await _repo.Get(v => v.id_account == id, tracked: false);
 
-            if (oldAccount == null ) return NotFound();
+            if (oldAccount == null) return NotFound();
 
             UpdateAccountDTO newAccount = _mapper.Map<UpdateAccountDTO>(oldAccount);
 

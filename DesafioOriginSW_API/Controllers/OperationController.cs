@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using DesafioOriginSW_API.Data;
 using DesafioOriginSW_API.DTO_s;
+using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
+using DesafioOriginSW_API.Models.Request;
 using DesafioOriginSW_API.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +17,7 @@ namespace DesafioOriginSW_API.Controllers
     public class OperationController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IOperationHandler _handler;
         private readonly IOperationRepository _repo;
         private readonly IBankCardRepository _repoBankCard;
         private readonly IAccountRepository _repoAccount;
@@ -24,19 +27,22 @@ namespace DesafioOriginSW_API.Controllers
         protected APIResponse _response;
 
 
-        public OperationController(ILogger<OperationController> logger,
-                                    IOperationRepository repo,
-                                    IBankCardRepository repoBankCard,
-                                    IAccountRepository repoAccount,
-                                    IOperationTypeRepository repoOperationType,
-                                    IMapper mapper)
+        public OperationController(
+            ILogger<OperationController> logger,
+            IOperationHandler handler,
+            IOperationRepository repo,
+            IBankCardRepository repoBankCard,
+            IAccountRepository repoAccount,
+            IOperationTypeRepository repoOperationType,
+            IMapper mapper)
         {
-            _logger = logger;
-            _repo = repo;
-            _repoBankCard = repoBankCard;
-            _repoAccount = repoAccount;
-            _repoOperationType = repoOperationType;
-            _mapper = mapper;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _handler = handler ?? throw new ArgumentNullException(nameof(handler));
+            _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+            _repoBankCard = repoBankCard ?? throw new ArgumentNullException(nameof(repoBankCard));
+            _repoAccount = repoAccount ?? throw new ArgumentNullException(nameof(repoAccount));
+            _repoOperationType = repoOperationType ?? throw new ArgumentNullException(nameof(repoOperationType));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _response = new();
         }
 
@@ -49,7 +55,7 @@ namespace DesafioOriginSW_API.Controllers
             try
             {
                 _logger.LogInformation("Get all operations");
-                IEnumerable<Operation> operationList = await _repo.GetAll();
+                IEnumerable<Operation> operationList = await _handler.GetAllOperations();
                 _response.Result = operationList;
                 _response.IsSuccessful = true;
                 _response.StatusCode = HttpStatusCode.OK;
@@ -66,16 +72,17 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpGet("id:int", Name = "GetOperation")]
+        [HttpGet("{id}", Name = "GetOperation")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetOperation(int id)
+        public async Task<ActionResult<APIResponse>> GetOperationById(int id)
         {
             try
             {
                 //_logger.LogInformation("Get all accounts");
-                var operationFiltered = await _repo.Get(v => v.id_operation == id);
+                var operationFiltered = await _handler.GetOperationById(id);
+
                 if (operationFiltered == null)
                 {
                     _response.IsSuccessful = false;
@@ -143,71 +150,21 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
 
-        private async Task<int> GetIdForBalanceOperation()
-        {
-            OperationType operationType = await _repoOperationType.Get(v => v.name == "balance");
-
-            return operationType.id_operation_type;
-        }
-
-        private async Task<int> GetIdForWithdrawOperation()
-        {
-            OperationType operationType = await _repoOperationType.Get(v => v.name == "retiro");
-
-            return operationType.id_operation_type;
-        }
-
-        private bool IsValidAmount(Double amount, Double balance)
-        {
-            return amount <= balance;
-        }
-
-        private Double PerformWithdrawal(Double amount, Double balance)
-        {
-            return balance - amount;
-        }
-
-        [HttpPost("Balance/bank_card_id:int", Name = "CheckBalance")]
+        [HttpGet("balance/{bank_card_id}", Name = "GetBalance")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> CheckBalance(int bank_card_id)
+        public async Task<ActionResult<APIResponse>> GetBalance(int bank_card_id)
         {
             try
             {
-                var bankCardFiltered = await _repoBankCard.Get(v => v.id_bank_card == bank_card_id);
-                if (bankCardFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.StatusCode = HttpStatusCode.NotFound;
-                    return NotFound(_response);
-                }
-                if (await _repoAccount.Get(v => v.id_account == bankCardFiltered.id_account) == null)
-                {
-                    _logger.LogError("Account id doesn't exist");
-                    ModelState.AddModelError("ErrorsMessage", "Account id not found");
-                    return BadRequest(ModelState);
-                }
-                var accountRelated = await _repoAccount.Get(v => v.id_account == bankCardFiltered.id_account);
+                GetBalanceDTO balance = await _handler.GetBalance(bank_card_id);
 
-                CheckBalanceDTO checkBalanceDTO = new CheckBalanceDTO();
-                checkBalanceDTO.balance = accountRelated.balance;
-                checkBalanceDTO.bank_card_number = bankCardFiltered.number;
-                checkBalanceDTO.bank_card_expiry_date = bankCardFiltered.expiry_date;
-
-                //var operationType = await _repoOperationType.Get(v => v.name == "balance");
-                Operation newOperation = new Operation();
-                newOperation.id_bank_card = bankCardFiltered.id_bank_card;
-                newOperation.id_operation_type = await GetIdForBalanceOperation();
-                newOperation.amount = accountRelated.balance;
-                newOperation.date = DateTime.Now;
-
-                await _repo.Create(newOperation);
-
-                _response.Result = checkBalanceDTO;
+                _response.Result = balance;
                 _response.StatusCode = HttpStatusCode.Created;
-                return CreatedAtRoute("GetOperation", new { id = newOperation.id_operation }, _response);
+
+                return await Task.FromResult(Ok(_response));
             }
             catch (Exception ex)
             {
@@ -219,59 +176,20 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
 
-        [HttpPost("Withdraw/bank_card_id:int", Name = "WithdrawBalance")]
+        [HttpPost("withdrawal", Name = "WithdrawalBalance")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<APIResponse>> WithdrawBalance(int bank_card_id, [FromBody] Double withdrawalAmount)
+        public async Task<ActionResult<APIResponse>> WithdrawalBalance([FromBody] WithdrawalRequest request)
         {
             try
             {
-                var bankCardFiltered = await _repoBankCard.Get(v => v.id_bank_card == bank_card_id);
-                if (bankCardFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.StatusCode = HttpStatusCode.NotFound;
-                    return NotFound(_response);
-                }
-                if (await _repoAccount.Get(v => v.id_account == bankCardFiltered.id_account) == null)
-                {
-                    _logger.LogError("Account id doesn't exist");
-                    ModelState.AddModelError("ErrorsMessage", "Account id not found");
-                    return BadRequest(ModelState);
-                }
-                var accountRelated = await _repoAccount.Get(v => v.id_account == bankCardFiltered.id_account);
+                var withdrawBalance = await _handler.WithdrawalBalance(request);
 
-                if(!IsValidAmount(withdrawalAmount, accountRelated.balance))
-                {
-                    _logger.LogError("Insufficient funds");
-                    _response.IsSuccessful = false;
-                    _response.StatusCode = HttpStatusCode.BadRequest;
-                    _response.ErrorsMessage = new List<String>() { "Insufficient funds" };
-                    return BadRequest(_response);
-                }
-
-                Double newBalance = PerformWithdrawal(withdrawalAmount, accountRelated.balance);
-
-                WithdrawBalanceDTO withdrawBalanceDTO = new WithdrawBalanceDTO();
-                withdrawBalanceDTO.balance = newBalance;
-                withdrawBalanceDTO.bank_card_number = bankCardFiltered.number;
-                withdrawBalanceDTO.withdrawal_amount = withdrawalAmount;
-                withdrawBalanceDTO.datetime = DateTime.Now;
-
-                //var operationType = await _repoOperationType.Get(v => v.name == "balance");
-                Operation newOperation = new Operation();
-                newOperation.id_bank_card = bankCardFiltered.id_bank_card;
-                newOperation.id_operation_type = await GetIdForWithdrawOperation();
-                newOperation.amount = withdrawalAmount;
-                newOperation.date = DateTime.Now;
-
-                await _repo.Create(newOperation);
-
-                _response.Result = withdrawBalanceDTO;
+                _response.Result = withdrawBalance;
                 _response.StatusCode = HttpStatusCode.Created;
-                return CreatedAtRoute("GetOperation", new { id = newOperation.id_operation }, _response);
+                return Ok(_response);
             }
             catch (Exception ex)
             {
@@ -279,11 +197,8 @@ namespace DesafioOriginSW_API.Controllers
                 _response.IsSuccessful = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.ErrorsMessage = new List<string>() { ex.ToString() };
-                return _response;
+                return BadRequest(_response);
             }
         }
-
-
-
     }
 }

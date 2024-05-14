@@ -16,20 +16,6 @@ namespace DesafioOriginSW_API.Data
         public DbSet<BankCard> bank_card { get; set; }
         public DbSet<Account> account { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<OperationType>().HasData(
-                new OperationType()
-                {
-                    id_operation_type = 1,
-                    name = "balance"
-                },
-                new OperationType()
-                {
-                    id_operation_type = 2,
-                    name = "retiro"
-                }
-            );
-        }
+        
     }
 }
