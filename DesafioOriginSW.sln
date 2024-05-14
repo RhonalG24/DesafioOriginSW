@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioOriginSW_API", "DesafioOriginSW_API\DesafioOriginSW_API.csproj", "{26DF5BE8-9AF4-4F62-BCFA-7539F4BD56A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DesafioOriginSW_API", "DesafioOriginSW_API\DesafioOriginSW_API.csproj", "{26DF5BE8-9AF4-4F62-BCFA-7539F4BD56A4}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "desafiooriginsw_client", "DesafioOriginSW_Client\desafiooriginsw_client.esproj", "{778AF9C6-CA94-441D-9380-33258FA9C74A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,12 @@ Global
 		{26DF5BE8-9AF4-4F62-BCFA-7539F4BD56A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26DF5BE8-9AF4-4F62-BCFA-7539F4BD56A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26DF5BE8-9AF4-4F62-BCFA-7539F4BD56A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{778AF9C6-CA94-441D-9380-33258FA9C74A}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

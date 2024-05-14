@@ -49,7 +49,7 @@ namespace DesafioOriginSW_API.Controllers
 
         }
 
-        [HttpGet("id:int", Name = "GetOperationType")]
+        [HttpGet("{id}", Name = "GetOperationType")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
