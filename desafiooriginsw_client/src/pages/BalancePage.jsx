@@ -1,9 +1,6 @@
 import {React, useState, useEffect} from 'react';
 import { storage } from '../utils/Storage';
 import NavigateButton from '../components/NavigateButton';
-import { OperationsApi } from '../api/operationsApi';
-import axios from 'axios';
-
 
 function BalancePage() {
   const [balance, setBalance] = useState(null);

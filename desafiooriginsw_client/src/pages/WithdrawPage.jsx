@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import NumericButton from '../components/NumericButton';
 import ActionButton from '../components/ActionButton';
 import NavigateButton from '../components/NavigateButton';
-import axios, { formToJSON } from 'axios';
+import axios from 'axios';
 import { OperationsApi } from '../api/operationsApi';
 import { storage } from '../utils/Storage';
 
@@ -26,10 +26,6 @@ function WithdrawPage() {
   }
 
   const submit = async () => {
-      console.log(inputValue)
-      // var formatInput = parseFloat(inputValue)
-      // var form = new FormData();
-      // form.withdrawalAmount = formatInput;
       
       const requestData = {
         "bank_card_id": bankCardId,
@@ -73,10 +69,10 @@ function WithdrawPage() {
   }
   return (
     <div className='max-w-xl mx-auto'>
-        <h1 className="text-blue-700 font-semibold">{'Ingrese el monto a retirar'}</h1>
+        <h1 className="text-black-700 font-semibold">{'Ingrese el monto a retirar'}</h1>
         <input id="formatInputField" name="formatInputField" type={ 'text' }
             value={inputValue} placeholder={'$ 0.00'} disabled required 
-            className=" h-auto border rounded-md p-2 " ></input>
+            className=" h-auto border rounded-md p-2 my-5" ></input>
 
             <div>
                 <NumericButton number={1} addValue={addValue}></NumericButton>
@@ -95,8 +91,8 @@ function WithdrawPage() {
             </div>
             <div>
                 <NumericButton number={0} addValue={addValue}></NumericButton>
-            </div>
-            <div>
+          </div>
+          <div className="mt-5">
               <ActionButton value="Limpiar" text={"Limpiar"} whenClick={clean} color={"yellow"}></ActionButton>
 
                 <button type="button" onClick={ submit }
@@ -108,7 +104,6 @@ function WithdrawPage() {
               <NavigateButton value={"/home"} text={"Salir"} color={"red" }></NavigateButton>
 
             </div>
-        {/*</form>*/}
     </div>
   );
 }

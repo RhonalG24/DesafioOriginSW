@@ -35,14 +35,14 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
           <h1 className="text-black-700 font-semibold">{title}</h1>
           <input id="formatInputField" name="formatInputField" type={ type }
               value={formatInputValue} placeholder={format} disabled required minLength={inputMaxLength}
-              className="mt-5 h-auto border rounded-md p-2"></input>
+              className="h-auto border rounded-md p-2 my-5"></input>
 
-              <div className='mt-5'>
+              <div>
                   <NumericButton number={1} addValue={addValue}></NumericButton>
                   <NumericButton number={2} addValue={addValue}></NumericButton>
                   <NumericButton number={3} addValue={addValue}></NumericButton>
               </div>
-              <div className="">
+              <div>
                   <NumericButton number={4} addValue={addValue}></NumericButton>
                   <NumericButton number={5} addValue={addValue}></NumericButton>
                   <NumericButton number={6} addValue={addValue}></NumericButton>
@@ -55,7 +55,7 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
               <div>
                   <NumericButton number={0} addValue={addValue}></NumericButton>
               </div>
-              <div className="">
+              <div className="mt-5">
               <ActionButton value="Limpiar" text={"Limpiar"} whenClick={clean} color={"yellow"}></ActionButton>
 
                 <button type="button" onClick={ submit }
