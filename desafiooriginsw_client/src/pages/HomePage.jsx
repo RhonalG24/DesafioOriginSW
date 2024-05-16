@@ -1,5 +1,4 @@
-import { useContext, useEffect } from 'react';
-import { React,  useState } from 'react';
+import React from 'react';
 import InputScreen from '../components/InputScreen';
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../utils/Storage';
@@ -8,6 +7,7 @@ import axios from 'axios';
 
 function HomePage() {
     const navigate = useNavigate()
+    storage.clear()
 
     const submit = async (cardNumber) => {
     
