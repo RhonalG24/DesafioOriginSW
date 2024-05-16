@@ -10,7 +10,7 @@ function OperationReportPage() {
   const [cardExpiryDate, setCardExpiryDate] = useState(null);
   const [withdrawalAmount, setWithdrawalAmount] = useState(null);
   const [operationDateTime, setOperationDateTime] = useState(null);
-  const thClassName = 'className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+  const thClassName = 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
   const tdClassName = 'px-6 py-4 whitespace-nowrap'
 
   useEffect(()=> {
@@ -35,13 +35,13 @@ function OperationReportPage() {
         <tr>
           <td className={tdClassName}>{bankCardNumber}</td>
           <td className={tdClassName}>{operationDateTime}</td>
-          <td className={tdClassName}>{withdrawalAmount}</td>
-          <td className={tdClassName}>{balance}</td>
+          <td className={tdClassName}>$ {withdrawalAmount}</td>
+          <td className={tdClassName}>$ {balance}</td>
         </tr>
       </tbody>
     </table>
     <NavigateButton value={"/operations"} text={"Atras"}></NavigateButton>
-    <NavigateButton value={"/home"} text={"Salir"}></NavigateButton>
+          <NavigateButton value={"/home"} text={"Salir"} color={"red"}></NavigateButton>
   </div>
   );
 }

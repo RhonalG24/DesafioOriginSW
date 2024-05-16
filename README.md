@@ -52,6 +52,8 @@ Si desea hacer estos pasos manualmente tendría que:
 ```
 npm install
 
+npm run buildcss
+
 npm run start
 ```
 El cliente se iniciará en [localhost](http://localhost:3000/).

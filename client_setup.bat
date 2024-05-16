@@ -6,6 +6,8 @@ call npm install
 
 call npm audit fix
 
+call npm run buildcss
+
 echo Client configurations done!
 
 call exit

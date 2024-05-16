@@ -9,7 +9,7 @@ function ErrorPage() {
     errorMessage = Array.isArray(errorMessage) ? errorMessage.join('. ') : errorMessage;
     return (
         <div className='max-w-xl mx-auto'>
-            <p className="text-red">Error: {errorMessage}</p>
+            <p className="text-red-500">Error: {errorMessage}</p>
             <NavigateButton value={navigateTo} text={"Atras"}></NavigateButton>
 
         </div>

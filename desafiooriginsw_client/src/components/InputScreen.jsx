@@ -32,17 +32,17 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
     }
   return (
       <div className='max-w-xl mx-auto'>
-          <h1 className="text-blue-700 font-semibold">{title}</h1>
+          <h1 className="text-black-700 font-semibold">{title}</h1>
           <input id="formatInputField" name="formatInputField" type={ type }
               value={formatInputValue} placeholder={format} disabled required minLength={inputMaxLength}
-              className="mt-5 h-auto border rounded-md p-2"></input>
+              className="h-auto border rounded-md p-2 my-5"></input>
 
-              <div className='mt-5'>
+              <div>
                   <NumericButton number={1} addValue={addValue}></NumericButton>
                   <NumericButton number={2} addValue={addValue}></NumericButton>
                   <NumericButton number={3} addValue={addValue}></NumericButton>
               </div>
-              <div className="">
+              <div>
                   <NumericButton number={4} addValue={addValue}></NumericButton>
                   <NumericButton number={5} addValue={addValue}></NumericButton>
                   <NumericButton number={6} addValue={addValue}></NumericButton>
@@ -55,11 +55,11 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
               <div>
                   <NumericButton number={0} addValue={addValue}></NumericButton>
               </div>
-              <div className="">
-                <ActionButton value="Limpiar" text={"Limpiar" } whenClick={clean}></ActionButton>
+              <div className="mt-5">
+              <ActionButton value="Limpiar" text={"Limpiar"} whenClick={clean} color={"yellow"}></ActionButton>
 
                 <button type="button" onClick={ submit }
-                    className='bg-green-500 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded m-2'
+                  className='bg-white-500 hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded m-2'
                 >Aceptar</button>
               </div>
       </div>

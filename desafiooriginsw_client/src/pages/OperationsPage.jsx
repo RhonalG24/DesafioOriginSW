@@ -35,7 +35,7 @@ function OperationsPage() {
 
     return (
 
-    <div className="flex justify-center w-full">
+    <div className="justify-center w-full">
         <h1>¿Cuál operación desea realizar?</h1>
          <div>
             <ActionButton value={"/balance"} text={"Consultar saldo"} whenClick={submit}></ActionButton>
@@ -44,7 +44,7 @@ function OperationsPage() {
             <NavigateButton value={"/withdraw"} text={"Retiro"}></NavigateButton>
           </div>
           <div>
-            <NavigateButton value={"/home"} text={"Salir"}></NavigateButton>
+                <NavigateButton value={"/home"} text={"Salir"} color={"red"}></NavigateButton>
 
           </div>
    
