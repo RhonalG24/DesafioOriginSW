@@ -32,7 +32,7 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
     }
   return (
       <div className='max-w-xl mx-auto'>
-          <h1 className="text-blue-700 font-semibold">{title}</h1>
+          <h1 className="text-black-700 font-semibold">{title}</h1>
           <input id="formatInputField" name="formatInputField" type={ type }
               value={formatInputValue} placeholder={format} disabled required minLength={inputMaxLength}
               className="mt-5 h-auto border rounded-md p-2"></input>
@@ -56,10 +56,10 @@ function InputScreen({ title, type="text", inputMaxLength, format, handleSubmit 
                   <NumericButton number={0} addValue={addValue}></NumericButton>
               </div>
               <div className="">
-                <ActionButton value="Limpiar" text={"Limpiar" } whenClick={clean}></ActionButton>
+              <ActionButton value="Limpiar" text={"Limpiar"} whenClick={clean} color={"yellow"}></ActionButton>
 
                 <button type="button" onClick={ submit }
-                    className='bg-green-500 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded m-2'
+                  className='bg-white-500 hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded m-2'
                 >Aceptar</button>
               </div>
       </div>

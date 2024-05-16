@@ -85,7 +85,7 @@ function CardPinPage() {
         <div>
 
         <InputScreen title="Ingrese el PIN de la tarjeta" type="password" inputMaxLength={4} format="* * * *" handleSubmit={submit} ></InputScreen>
-        <NavigateButton value={"/home"} text={"Salir"}></NavigateButton>
+            <NavigateButton value={"/home"} text={"Salir"} color={"red"}></NavigateButton>
         </div>
 
     );

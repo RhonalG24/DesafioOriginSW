@@ -97,15 +97,15 @@ function WithdrawPage() {
                 <NumericButton number={0} addValue={addValue}></NumericButton>
             </div>
             <div>
-            <ActionButton value="Limpiar" text={"Limpiar" } whenClick={clean}></ActionButton>
+              <ActionButton value="Limpiar" text={"Limpiar"} whenClick={clean} color={"yellow"}></ActionButton>
 
                 <button type="button" onClick={ submit }
-                    className='bg-green-500 hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded m-2'
+                  className='bg-white-500 hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded m-2'
                 >Aceptar</button>
             </div>
             <div>
               <NavigateButton value={"/operations"} text={"Atras"}></NavigateButton>
-              <NavigateButton value={"/home"} text={"Salir"}></NavigateButton>
+              <NavigateButton value={"/home"} text={"Salir"} color={"red" }></NavigateButton>
 
             </div>
         {/*</form>*/}
