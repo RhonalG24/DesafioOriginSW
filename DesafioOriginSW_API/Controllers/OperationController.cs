@@ -5,9 +5,7 @@ using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Models.Request;
 using DesafioOriginSW_API.Repository.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
 
 namespace DesafioOriginSW_API.Controllers
