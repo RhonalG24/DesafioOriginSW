@@ -1,5 +1,5 @@
 ﻿using DesafioOriginSW_API.Data;
-using DesafioOriginSW_API.Models;
+using DesafioOriginSW_API.Models.Entities;
 using DesafioOriginSW_API.Repository.IRepository;
 
 namespace DesafioOriginSW_API.Repository

@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DesafioOriginSW_API.Models
+namespace DesafioOriginSW_API.Models.Entities
 {
     public class OperationType
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 id_operation_type { get; set; }
+        public int id_operation_type { get; set; }
 
         [Required]
-        public String name { get; set; }
+        public string name { get; set; }
     }
 }

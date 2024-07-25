@@ -8,12 +8,15 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container.   
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen( options =>
+{
+    options.CustomSchemaIds( type => type.ToString() );
+});
 
 builder.Services.AddDbContext<AppDbContext>(option =>
 {
@@ -39,7 +42,9 @@ builder.Services.AddScoped<IOperationTypeRepository, OperationTypeRepository>();
 builder.Services.AddScoped<ICardStateRepository, CardStateRepository>();
 
 builder.Services.AddScoped<IAccountHandler, AccountHandler>();
+builder.Services.AddScoped<ICardStateHandler, CardStateHandler>();
 builder.Services.AddScoped<IOperationHandler, OperationHandler>();
+builder.Services.AddScoped<IOperationTypeHandler, OperationTypeHandler>();
 
 var app = builder.Build();
 

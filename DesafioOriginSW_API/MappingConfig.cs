@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Models;
+using DesafioOriginSW_API.Models.Entities;
+using DesafioOriginSW_API.Models.Responses;
+using DesafioOriginSW_API.Models.Responses.Account;
 
 namespace DesafioOriginSW_API
 {
@@ -10,6 +13,12 @@ namespace DesafioOriginSW_API
         {
             CreateMap<Account, AccountDTO>().ReverseMap();
             CreateMap<Account, UpdateAccountDTO>().ReverseMap();
+            CreateMap<Account, GetAllAccountsResponse>().ReverseMap();
+            CreateMap<Account, GetAccountResponse>().ReverseMap();
+            CreateMap<Account, UpdateAccountResponse>().ReverseMap();
+            CreateMap<Account, UpdatePartialAccountResponse>().ReverseMap();
+
+            CreateMap<CardState, CardStateResponse>().ReverseMap();
 
             CreateMap<BankCard, BankCardDTO>().ReverseMap();
             CreateMap<BankCard, BankCardPinDTO>().ReverseMap();

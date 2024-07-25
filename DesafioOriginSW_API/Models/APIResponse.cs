@@ -2,12 +2,21 @@
 
 namespace DesafioOriginSW_API.Models
 {
-    public class APIResponse
+    public class APIResponse<T>
     {
-        public HttpStatusCode StatusCode { get; set; }
+        public APIResponse() { }
+        public APIResponse(T? result, bool isSuccessful, HttpStatusCode statusCode, List<string>? errorsMessage)
+        {
+            Status = statusCode;
+            IsSuccessful = isSuccessful;
+            Detail = errorsMessage;
+            Result = result;
+        }
+
+        public HttpStatusCode Status { get; set; }
         public bool IsSuccessful { get; set; } = true;
-        public List<string>? ErrorsMessage { get; set; }
-        public object? Result { get; set; }
+        public List<string>? Detail { get; set; }
+        public T? Result { get; set; }
     }
 }
 

@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DesafioOriginSW_API.Models
+namespace DesafioOriginSW_API.Models.Entities
 {
     public class Account
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Int32 id_account { get; set; }
+        public int id_account { get; set; }
 
         [Required]
-        public Double balance { get; set; }
+        public double balance { get; set; }
     }
 }

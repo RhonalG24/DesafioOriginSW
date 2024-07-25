@@ -1,4 +1,4 @@
-﻿using DesafioOriginSW_API.Models;
+﻿using DesafioOriginSW_API.Models.Entities;
 
 namespace DesafioOriginSW_API.Repository.IRepository
 {

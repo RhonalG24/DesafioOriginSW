@@ -1,10 +1,10 @@
 ﻿
 using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Handlers.IHandler;
-using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Repository.IRepository;
-using Operation = DesafioOriginSW_API.Models.Operation;
+using Operation = DesafioOriginSW_API.Models.Entities.Operation;
 using DesafioOriginSW_API.Models.Request;
+using DesafioOriginSW_API.Models.Entities;
 
 namespace DesafioOriginSW_API.Handlers
 {
@@ -30,7 +30,7 @@ namespace DesafioOriginSW_API.Handlers
 
         public async Task<IEnumerable<Operation>> GetAllOperations()
         {
-            List<Operation> result = await _operationRepository.GetAll();
+            IEnumerable<Operation> result = await _operationRepository.GetAll();
 
             return await Task.FromResult(result);
         }

@@ -36,7 +36,7 @@ namespace DesafioOriginSW_API.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<List<T>> GetAll(Expression<Func<T, bool>>? filter = null)
+        public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = dbSet;
             if (filter != null)

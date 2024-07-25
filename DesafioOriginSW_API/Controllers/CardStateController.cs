@@ -1,85 +1,48 @@
-﻿using AutoMapper;
-using DesafioOriginSW_API.Data;
-using DesafioOriginSW_API.Models;
-using DesafioOriginSW_API.Repository.IRepository;
+﻿using DesafioOriginSW_API.Handlers.IHandler;
+using DesafioOriginSW_API.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace DesafioOriginSW_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CardStateController : ControllerBase
+    public class CardStateController : ResultsControllerBase
     {
         private readonly ILogger _logger;
-        private readonly ICardStateRepository _repo;
-        private readonly IMapper _mapper;
-        protected APIResponse _response;
+        private readonly ICardStateHandler _handler;
 
-
-        public CardStateController(ILogger<CardStateController> logger,
-                                    ICardStateRepository repo,
-                                    IMapper mapper)
+        public CardStateController(
+            ILogger<CardStateController> logger,
+            ICardStateHandler handler)
         {
-            _logger = logger;
-            _repo = repo;
-            _mapper = mapper;
-            _response = new();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _handler = handler ?? throw new ArgumentNullException(nameof(handler));
+
         }
 
+        #region Decorators [HttpGet]
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse>> GetAllCardStates()
+        [ProducesResponseType(typeof(IEnumerable<CardStateResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        #endregion
+        public async Task<ActionResult<IEnumerable<CardStateResponse>>> GetAllCardStates()
         {
-            try
-            {
-                IEnumerable<CardState> cardStateList = await _repo.GetAll();
-                _response.Result = cardStateList;
-                _response.IsSuccessful = true;
-                _response.StatusCode = HttpStatusCode.OK;
-                return Ok(_response);
+            var cardStateList = await _handler.GetAllCardStates();
 
-            } catch (Exception ex)
-            {
-                _logger.LogError("GetAllCardStates", ex.Message);
-                _response.IsSuccessful = false;
-                _response.StatusCode = HttpStatusCode.InternalServerError;
-                _response.ErrorsMessage = new List<string>() { ex.ToString() }; 
-                return _response;
-            }
+            return Ok(cardStateList);
 
         }
 
+        #region [HttpGet("{id}", Name = "GetCardState")]
         [HttpGet("{id}", Name = "GetCardState")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType( StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse>> GetCardState(int id)
-        {
-            try
-            {
-                //_logger.LogInformation("Get all accounts");
-                var cardStateFiltered = await _repo.Get(x => x.id_card_state == id);
-                if (cardStateFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.StatusCode = HttpStatusCode.NotFound;
-                    return NotFound(_response);
-
-                }
-                _response.Result = cardStateFiltered;
-                _response.StatusCode = HttpStatusCode.OK;
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Get operation", ex.Message);
-                _response.IsSuccessful = false;
-                _response.StatusCode = HttpStatusCode.InternalServerError;
-                _response.ErrorsMessage = new List<string>() { ex.ToString() };
-                return _response;
-            }
-
+        #endregion
+        public async Task<ActionResult<CardStateResponse>> GetCardState(int id)
+        { 
+            var cardState = await _handler.GetCardState(id);
+            return Ok(cardState);
         }
     }
 }

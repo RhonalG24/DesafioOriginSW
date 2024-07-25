@@ -1,5 +1,5 @@
 ﻿using DesafioOriginSW_API.DTO_s;
-using DesafioOriginSW_API.Models;
+using DesafioOriginSW_API.Models.Entities;
 using DesafioOriginSW_API.Models.Request;
 
 namespace DesafioOriginSW_API.Handlers.IHandler

@@ -1,4 +1,4 @@
-﻿using DesafioOriginSW_API.Models;
+﻿using DesafioOriginSW_API.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DesafioOriginSW_API.Data
