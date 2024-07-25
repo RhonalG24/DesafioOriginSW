@@ -2,8 +2,9 @@
 using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Models.Entities;
-using DesafioOriginSW_API.Models.Responses;
 using DesafioOriginSW_API.Models.Responses.Account;
+using DesafioOriginSW_API.Models.Responses.CardState;
+using DesafioOriginSW_API.Models.Responses.OperationType;
 
 namespace DesafioOriginSW_API
 {
@@ -18,7 +19,7 @@ namespace DesafioOriginSW_API
             CreateMap<Account, UpdateAccountResponse>().ReverseMap();
             CreateMap<Account, UpdatePartialAccountResponse>().ReverseMap();
 
-            CreateMap<CardState, CardStateResponse>().ReverseMap();
+            CreateMap<CardState, GetCardStateResponse>().ReverseMap();
 
             CreateMap<BankCard, BankCardDTO>().ReverseMap();
             CreateMap<BankCard, BankCardPinDTO>().ReverseMap();
@@ -28,6 +29,9 @@ namespace DesafioOriginSW_API
 
             CreateMap<Operation, OperationDTO>().ReverseMap();
             CreateMap<Operation, CreateOperationDTO>().ReverseMap();
+
+
+            CreateMap<OperationType, GetOperationTypeResponse>().ReverseMap();
 
         }
     }

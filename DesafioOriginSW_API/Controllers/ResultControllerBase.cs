@@ -3,6 +3,7 @@ using DesafioOriginSW_API.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using DesafioOriginSW_API.Models;
 
 namespace DesafioOriginSW_API.Controllers
 {
@@ -10,9 +11,17 @@ namespace DesafioOriginSW_API.Controllers
     {
         protected ActionResult<T> Ok<T>(IResult<T> result)
         {
-            if (result.IsSuccess)
+            /*if (result.IsSuccess)
             {
                 return Ok(result.Value);
+            }*/
+            if (result.IsSuccess)
+            {
+                return Ok(new APIResponse<T>(
+                    result: result.Value,
+                    isSuccessful: true,
+                    statusCode: System.Net.HttpStatusCode.OK,
+                    errorsMessage: null));
             }
 
             var error = result.Errors.First();
@@ -24,6 +33,9 @@ namespace DesafioOriginSW_API.Controllers
 
             if (error is NotFoundError)
                 return Problem(detail: error.Message, statusCode: StatusCodes.Status404NotFound);
+
+            if (error is BadRequestError)
+                return Problem(detail: error.Message, statusCode: StatusCodes.Status400BadRequest);
 
             // Throw - because we've got an error we haven't accounted for
             //return Problem(detail: error.Message, statusCode: StatusCodes.Status500InternalServerError);

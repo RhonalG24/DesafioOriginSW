@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using DesafioOriginSW_API.Data;
 using DesafioOriginSW_API.DTO_s;
+using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Models.Entities;
+using DesafioOriginSW_API.Models.Requests.BankCard;
+using DesafioOriginSW_API.Models.Responses.BankCard;
 using DesafioOriginSW_API.Repository.IRepository;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +26,8 @@ namespace DesafioOriginSW_API.Controllers
         private readonly IOperationTypeRepository _repoOperationType;
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
+
+        private readonly IBankCardHandler _bankCardHandler;
         //protected APIResponse _response;
 
 
@@ -34,7 +39,8 @@ namespace DesafioOriginSW_API.Controllers
             IOperationTypeRepository repoOperationType,
             AppDbContext db,
             IMapper mapper
-        )
+,
+            IBankCardHandler bankCardHandler)
         {
             _logger = logger;
             _repo = repo;
@@ -43,36 +49,21 @@ namespace DesafioOriginSW_API.Controllers
             _repoOperationType = repoOperationType;
             _db = db;
             _mapper = mapper;
+            _bankCardHandler = bankCardHandler ?? throw new ArgumentNullException(nameof(bankCardHandler));
             //_response = new();
         }
 
 
         #region [HttpGet]
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(APIResponse<GetAllBankCardResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<IEnumerable<BankCard>>>> GetAllBankCards()
+        public async Task<ActionResult<GetAllBankCardResponse>> GetAllBankCards()
         {
-            APIResponse<IEnumerable<BankCard>> _response = new();
-            try
-            {
-                _logger.LogInformation("Get all bank cards");
-                IEnumerable<BankCard> bankCardList = await _repo.GetAll();
-                _response.Result = bankCardList;
-                _response.IsSuccessful = true;
-                _response.Status = HttpStatusCode.OK;
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Get all BankCards", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
+            var response = await _bankCardHandler.GetAllBankCards();
+            return Ok(response);
 
         }
 
@@ -82,31 +73,10 @@ namespace DesafioOriginSW_API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<BankCard>>> GetBankCard(int id)
+        public async Task<ActionResult<GetBankCardResponse>> GetBankCard(int id)
         {
-            APIResponse<BankCard> _response = new();
-            try
-            {
-                var bankCardFiltered = await _repo.Get(v => v.id_bank_card == id);
-                if (bankCardFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.Status = HttpStatusCode.NotFound;
-                    return NotFound(_response);
-
-                }
-                _response.Result = bankCardFiltered;
-                _response.Status = HttpStatusCode.OK;
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Get Bank Card", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
+            var response = await _bankCardHandler.GetBankCard(id);
+            return Ok(response);
 
         }
 
@@ -115,39 +85,13 @@ namespace DesafioOriginSW_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         #endregion
-        public async Task<ActionResult<APIResponse<BankCard>>> CreateBankCard([FromBody] CreateBankCardDTO createDTO)
+        public async Task<ActionResult<CreateBankCardResponse>> CreateBankCard([FromBody] CreateBankCardRequest request)
         {
-            APIResponse<BankCard> _response = new();
-            try
-            {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!IsModelStateValid(ModelState))
+                return ReturnModelStateErrors(ModelState);
 
-                //verify that associated account exist
-                if (await _repoAccount.Get(v => v.id_account == createDTO.id_account) == null)
-                {
-                    _logger.LogError("Account id doesn't exist");
-                    ModelState.AddModelError("ErrorsMessage", "Account id not found");
-                    return BadRequest(ModelState);
-                }
-
-                BankCard newBankCard = _mapper.Map<BankCard>(createDTO);
-                newBankCard.expiry_date = DateOnly.FromDateTime(DateTime.Now.AddYears(10));
-                newBankCard.id_card_state = 1; //Active
-
-                await _repo.Create(newBankCard);
-                _response.Status = HttpStatusCode.Created;
-                _response.Result = newBankCard;
-                return CreatedAtRoute("GetBankCard", new { id = newBankCard.id_bank_card }, _response);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Create Bank Card", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
+            var response = await _bankCardHandler.CreateBankCard(request);
+            return Ok(response);
         }
 
         #region [HttpGet("check/number/{bank_card_number}", Name = "CheckBankCardNumber")]
@@ -158,45 +102,14 @@ namespace DesafioOriginSW_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<CheckBankCardNumberRespondDTO>>> CheckBankCardNumberDTO(String bank_card_number)
+        public async Task<ActionResult<CheckBankCardNumberResponse>> CheckBankCardNumber(CheckBankCardNumberRequest request)
         {
-            APIResponse<CheckBankCardNumberRespondDTO > _response = new();
-            try
-            {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-                
-                BankCard bankCardFiltered = await _repo.Get(v => v.number == bank_card_number);
-                if (bankCardFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.Status = HttpStatusCode.NotFound;
-                    return NotFound(_response);
+            if (!IsModelStateValid(ModelState))
+                return ReturnModelStateErrors(ModelState);
 
-                }
-                //Verify if it's blocked
-                if (bankCardFiltered.id_card_state == await GetIdForBlockedCardState())
-                {
-                    _response.IsSuccessful = false;
-                    _response.Status = HttpStatusCode.Unauthorized;
-                    _response.Detail = new List<String>() { "The card is blocked" };
-                    return Unauthorized(_response);
-                }
+            var response = await _bankCardHandler.CheckBankCardNumber(request);
+            return Ok(response);
 
-                CheckBankCardNumberRespondDTO BankCardRespond = _mapper.Map<CheckBankCardNumberRespondDTO>(bankCardFiltered);
-
-                _response.Status = HttpStatusCode.OK;
-                _response.Result = BankCardRespond;
-                return Ok(_response);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("CheckBankCardNumber", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
         }
 
         #region [HttpPost("check/pin/{bank_card_id}", Name = "CheckCardPin")]
@@ -206,14 +119,17 @@ namespace DesafioOriginSW_API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<BankCard>>> CheckBankCardPin(int bank_card_id, [FromBody] CheckBankCardPinDTO checkCardPinDTO)
+        public async Task<ActionResult<CheckBankCardPinResponse>> CheckBankCardPin(int bank_card_id, [FromBody] CheckBankCardPinRequest request)
         {
+            if (!IsModelStateValid(ModelState))
+                return ReturnModelStateErrors(ModelState);
+
             APIResponse<BankCard> _response = new();
             try
             {
                 if (!ModelState.IsValid) return BadRequest(ModelState);
                 
-                BankCard bankCardFiltered = await _repo.Get(v => v.id_bank_card == checkCardPinDTO.id_bank_card);
+                BankCard bankCardFiltered = await _repo.Get(v => v.id_bank_card == request.id_bank_card);
                 if (bankCardFiltered == null)
                 {
                     List<string> errors = new List<string>{"not found", "no se encontró el dato" };
@@ -231,18 +147,18 @@ namespace DesafioOriginSW_API.Controllers
                     return Unauthorized(_response);
                 }
                     //Verify card pin
-                if ( bankCardFiltered.pin != checkCardPinDTO.pin)
+                if ( bankCardFiltered.pin != request.pin)
                 {
                     _response.IsSuccessful = false;
                     bankCardFiltered.failed_attempts += 1;
-                    if( bankCardFiltered.failed_attempts >= 4)
+                    if (bankCardFiltered.failed_attempts >= GetMaxFailedAttempts())
                     {
                         bankCardFiltered.id_card_state = await GetIdForBlockedCardState();
                         _response.Detail = new List<String>() { "PIN invalid", "The card has been blocked" };
                     }
                     else
                     {
-                        int remaining_attempts = 4 - bankCardFiltered.failed_attempts;
+                        int remaining_attempts = GetMaxFailedAttempts() - bankCardFiltered.failed_attempts;
                         _response.Detail = new List<String>() { "PIN invalid", "remaining_attempts: " + (remaining_attempts >= 0 ? remaining_attempts : 0) };
                     }
                     _response.Status = HttpStatusCode.Unauthorized;
@@ -272,11 +188,6 @@ namespace DesafioOriginSW_API.Controllers
             }
         }
 
-        private async Task<int> GetIdForBlockedCardState()
-        {
-            CardState cardState = await _repoCardState.Get(v => v.name == "bloqueada");
 
-            return cardState.id_card_state;
-        }
     }
 }

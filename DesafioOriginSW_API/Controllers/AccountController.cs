@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
+using System.Reflection.Metadata;
 
 namespace DesafioOriginSW_API.Controllers
 {
@@ -20,79 +21,33 @@ namespace DesafioOriginSW_API.Controllers
     public class AccountController : ResultsControllerBase
     {
         private readonly ILogger _logger;
-        private readonly IAccountRepository _repo;
-        private readonly IMapper _mapper;
         private readonly IAccountHandler _handler;
-        //protected APIResponse<> _response;
 
         public AccountController(IAccountHandler handler, ILogger<AccountController> logger, IAccountRepository repo, IMapper mapper)
         {
             _handler = handler ?? throw new ArgumentNullException(nameof(handler));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _repo = repo ?? throw new ArgumentNullException(nameof(repo));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            //_response = new();
         }
 
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<APIResponse<GetAllAccountsResponse>>> GetAllAccounts()
+        [ProducesResponseType(typeof(APIResponse<GetAllAccountsResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetAllAccountsResponse>> GetAllAccounts()
         {
-            APIResponse<GetAllAccountsResponse> _response = new();
-            try
-            {
-                _logger.LogInformation("Get all accounts");
-                GetAllAccountsResponse accountList = await _handler.GetAllAccounts();
-                _response.Status = HttpStatusCode.OK;
-                _response.Result = accountList ?? throw new ArgumentNullException(nameof(accountList));
-
-                return Ok(_response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Update account", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
+            _logger.LogInformation("Get all accounts");
+            var response = await _handler.GetAllAccounts();
+            return Ok(response);
         }
 
         #region [HttpGet("{id}", Name = "GetAccount")]
         [HttpGet("{id}", Name = "GetAccount")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(APIResponse<GetAccountResponse>),StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<Account>>> GetAccount(int id)
-        {
-            APIResponse<Account> _response = new();
-            try
-            {
-                //_logger.LogInformation("Get all accounts");
-                var accountFiltered = await _repo.Get(v => v.id_account == id);
-                if (accountFiltered == null)
-                {
-                    _response.IsSuccessful = false;
-                    _response.Status = HttpStatusCode.NotFound;
-                    return NotFound(_response);
-
-                }
-                else
-                {
-                    _response.Result = accountFiltered ?? throw new ArgumentNullException(nameof(accountFiltered));
-                    _response.Status = HttpStatusCode.OK;
-                    return Ok(_response);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Get account", ex.Message);
-                _response.IsSuccessful = false;
-                _response.Status = HttpStatusCode.InternalServerError;
-                _response.Detail = new List<string>() { ex.ToString() };
-                return _response;
-            }
+        public async Task<ActionResult<GetAccountResponse>> GetAccount(int id)
+    {
+            var response = await _handler.GetAccount(id);
+            return Ok(response);
 
         }
         
@@ -134,13 +89,13 @@ namespace DesafioOriginSW_API.Controllers
 
         }*/
 
-        #region [HttpPut("{id}")]
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        #region [HttpPut]
+        [HttpPut]
+        [ProducesResponseType(typeof(APIResponse<UpdateAccountResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<APIResponse<Account>>> UpdateAccount(int id, [FromBody] UpdateAccountRequest request)
+        public async Task<ActionResult<UpdateAccountResponse>> UpdateAccount([FromBody] UpdateAccountRequest request)
         {
             if (!IsModelStateValid(ModelState))
             {
@@ -150,22 +105,7 @@ namespace DesafioOriginSW_API.Controllers
             var response = await _handler.UpdateAccount(request); 
 
             return Ok(response);
-
-
         }        
-
-        //private BadRequestObjectResult ReturnModelStateErrors(ModelStateDictionary modelState)
-        //{
-        //    var errors = ModelState.Values
-        //                           .SelectMany(v => v.Errors)
-        //                           .Select(e => e.ErrorMessage)
-        //                           .ToList();
-
-        //    var result = Result.Fail("Validation failed")
-        //                       .WithErrors(errors);
-
-        //    return BadRequest(result);
-        //}
         
         /*#region [HttpPut("{id}")]
         [HttpPut("{id}")]

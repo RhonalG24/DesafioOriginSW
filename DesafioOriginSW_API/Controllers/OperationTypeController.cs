@@ -1,7 +1,7 @@
 ﻿using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Models.Entities;
-using DesafioOriginSW_API.Models.Response;
+using DesafioOriginSW_API.Models.Responses.OperationType;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DesafioOriginSW_API.Controllers
@@ -20,10 +20,10 @@ namespace DesafioOriginSW_API.Controllers
 
         #region [HttpGet]
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(APIResponse<GetAllOperationTypesResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         #endregion
-        public async Task<ActionResult<AllOperationTypesResponse>> GetAllOperationTypes()
+        public async Task<ActionResult<GetAllOperationTypesResponse>> GetAllOperationTypes()
         {
             var operationTypes = await _operationTypeHandler.GetAllOperationTypes();
             return Ok(operationTypes);
@@ -64,12 +64,12 @@ namespace DesafioOriginSW_API.Controllers
 
         #region [HttpGet("{id}", Name = "GetOperationType")]
         [HttpGet("{id}", Name = "GetOperationType")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(APIResponse<GetOperationTypeResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         #endregion
-        public async Task<ActionResult<APIResponse<OperationType>>> GetOperationType(int id)
+        public async Task<ActionResult<GetOperationTypeResponse>> GetOperationType(int id)
         {
             var operationType = await _operationTypeHandler.GetOperationType(id);
             return Ok(operationType);

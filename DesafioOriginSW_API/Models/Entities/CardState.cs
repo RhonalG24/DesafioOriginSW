@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DesafioOriginSW_API.Models.Entities
 {
+    public enum BankCardState: int
+    {
+        activa = 1,
+        bloqueada = 2,
+        cancelada = 3,
+    }
     public class CardState
     {
         [Key]
@@ -11,5 +17,6 @@ namespace DesafioOriginSW_API.Models.Entities
 
         [Required]
         public string name { get; set; }
+        
     }
 }

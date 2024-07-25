@@ -1,4 +1,5 @@
 ﻿using DesafioOriginSW_API.Models;
+using DesafioOriginSW_API.Models.Entities;
 using DesafioOriginSW_API.Models.Requests.Account;
 using DesafioOriginSW_API.Models.Responses.Account;
 using FluentResults;
@@ -8,12 +9,14 @@ namespace DesafioOriginSW_API.Handlers.IHandler
 {
     public interface IAccountHandler
     {
-        Task<Result<APIResponse<GetAllAccountsResponse>>> GetAllAccounts();
+        Task<Result<GetAllAccountsResponse>> GetAllAccounts();
 
-        Task<Result<APIResponse<GetAccountResponse>>> GetAccount(int id);
+        Task<Result<GetAccountResponse>> GetAccount(int id);
 
-        Task<Result<APIResponse<UpdateAccountResponse>>> UpdateAccount(UpdateAccountRequest request);
+        Task<Result<UpdateAccountResponse>> UpdateAccount(UpdateAccountRequest request);
 
-        Task<Result<APIResponse<UpdatePartialAccountResponse>>> UpdatePartialAccount(JsonPatchDocument<UpdatePartialAccountRequest> request);
+        Task<Account> GetAccountById(int id);
+
+        //Task<Result<APIResponse<UpdatePartialAccountResponse>>> UpdatePartialAccount(JsonPatchDocument<UpdatePartialAccountRequest> request);
     }
 }

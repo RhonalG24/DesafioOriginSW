@@ -3,8 +3,8 @@ using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Repository.IRepository;
 using Operation = DesafioOriginSW_API.Models.Entities.Operation;
-using DesafioOriginSW_API.Models.Request;
 using DesafioOriginSW_API.Models.Entities;
+using DesafioOriginSW_API.Models.Requests.Operation;
 
 namespace DesafioOriginSW_API.Handlers
 {

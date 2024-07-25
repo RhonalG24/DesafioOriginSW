@@ -4,7 +4,7 @@ using DesafioOriginSW_API.DTO_s;
 using DesafioOriginSW_API.Handlers.IHandler;
 using DesafioOriginSW_API.Models;
 using DesafioOriginSW_API.Models.Entities;
-using DesafioOriginSW_API.Models.Request;
+using DesafioOriginSW_API.Models.Requests.Operation;
 using DesafioOriginSW_API.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
